@@ -4,8 +4,18 @@ const AC_SELECTOR = document.getElementById("ac_protocol_selector");
 const ON_BUTTON = document.getElementById("on_button");
 const OFF_BUTTON = document.getElementById("off_button");
 const TEMP_SCREEN = document.getElementById("temp-screen");
+const TOGGLE_MODE = document.getElementById("toggle_mode");
+
+const PROTOCOL_FORM = document.getElementById("protocolForm");
+const PROTOCOL_INPUT = document.getElementById("protoInput");
+const SERVICE_INPUT = document.getElementById("serviceInput");
+const ROOM_INPUT = document.getElementById("roomInput");
+const PROTOCOL_LIST = document.getElementById("protocolList");
+
 const SERVER_PORT = 5000;
 
+let currentMode = "cool";
+let savedProtocols = [];
 let powerStatus = true;
 let canvas = document.querySelector("canvas");
 let ctx = canvas.getContext("2d");
@@ -32,7 +42,14 @@ protocols.forEach(protocol => {
     option.value = protocols.indexOf(protocol) + 1;
     option.textContent = protocol;
     AC_SELECTOR.appendChild(option);
+
+		const option2 = document.createElement("option");
+    option2.value = protocols.indexOf(protocol) + 1;
+    option2.textContent = protocol;
+    PROTOCOL_INPUT.appendChild(option2);
+		
 });
+
 
 ws.onmessage = async (msg) => {
     console.log(msg);
@@ -86,6 +103,18 @@ OFF_BUTTON.addEventListener("click", async (ev) => {
     }).catch(error => console.error("Failed to send aircon command: ", error));
 })
 
+TOGGLE_MODE.addEventListener("click", () => {
+  currentMode = (currentMode === "cool") ? "heat" : "cool";
+  TOGGLE_MODE.textContent = `Mode: ${currentMode.charAt(0).toUpperCase() + currentMode.slice(1)}`;
+	
+  sendDataToAircon({
+    protocol: Number(AC_SELECTOR.value),
+    temperature: "current",
+    power: powerStatus
+		// mode: currentMode
+  }).catch(error => console.error("Failed to send aircon command: ", error));
+});
+
 async function sendDataToAircon(JSONBody) {
     const response = await fetch(`http://fing-bot.brazilsouth.cloudapp.azure.com:${SERVER_PORT}/aircon`, {
         method: "PUT",
@@ -102,4 +131,47 @@ async function sendDataToAircon(JSONBody) {
     const data = await response.json();
     console.log("Server response: ", data);
     TEMP_SCREEN.innerHTML = data.temperature;
+}
+
+
+
+PROTOCOL_FORM.addEventListener("submit", (e) => {
+  e.preventDefault();
+
+  const protocol = PROTOCOL_INPUT.value.trim();
+  const service = SERVICE_INPUT.value.trim();
+  const room = ROOM_INPUT.value.trim();
+
+  if (!protocol || !service || !room) {
+    console.error("All fields must be filled out!");
+    return;
+  }
+
+  savedProtocols.push({ protocol, service, room });
+  renderProtocolList();
+
+  PROTOCOL_INPUT.value = "";
+  SERVICE_INPUT.value = "";
+  ROOM_INPUT.value = "";
+});
+
+function renderProtocolList() {
+  PROTOCOL_LIST.innerHTML = "";
+  savedProtocols.forEach(({ protocol, service, room }) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.style.width = "100%";
+    btn.style.marginBottom = "0.3rem";
+    btn.textContent = `${protocols[protocol - 1]} - ${service} - ${room}`;
+
+    btn.addEventListener("click", () => {
+      const option = Array.from(AC_SELECTOR.options).find(o => o.value === protocol);
+      if (option) {
+        AC_SELECTOR.value = protocol;
+        AC_SELECTOR.dispatchEvent(new Event('change'));
+      }
+    });
+
+    PROTOCOL_LIST.appendChild(btn);
+  });
 }
