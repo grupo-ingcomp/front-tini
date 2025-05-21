@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="index.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+        rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <script defer src="index.js"></script>
+    <title>Panel - TINSCF</title>
+</head>
+
+<body>
+    <h1 id="title">Centro de monitoreo de salón inteligente</h1>
+    <div id="panel">
+        <div class="subtitle-container">
+            <h2 class="subtitle">Cámara térmica para control de aforo</h2>
+            <h2 class="subtitle">Aire acondicionado</h2>
+        </div>
+        <div class="dashboards">
+            <div class="cam">
+                <img alt="Imagen de cámara térmica del salón"
+                    style="width: 50%; height: 70%;   image-rendering: crisp-edges;">
+                <canvas width="3" height="2" style="width: 320px; height: 240px; image-rendering: crisp-edges"></canvas>
+            </div>
+            <div class="remote-control">
+                <select name="ac_protocol_selector" id="ac_protocol_selector"></select>
+                <div class="temp-icons">
+                    <div class="power-button" id="on_button">On</div>
+                    <div class="power-button" id="off_button">Off</div>
+                    <svg class="manage-temp-icon" id="inc_temp" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                        <path
+                            d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 144L48 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l144 0 0 144c0 17.7 14.3 32 32 32s32-14.3 32-32l0-144 144 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-144 0 0-144z" />
+                    </svg>
+                    <svg class="manage-temp-icon" id="dec_temp" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                        <path
+                            d="M432 256c0 17.7-14.3 32-32 32L48 288c-17.7 0-32-14.3-32-32s14.3-32 32-32l352 0c17.7 0 32 14.3 32 32z" />
+                    </svg>
+                </div>
+                <div id="temp-screen">
+                    -
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,105 @@
+const INC_TEMP_ICON = document.getElementById("inc_temp");
+const DEC_TEMP_ICON = document.getElementById("dec_temp");
+const AC_SELECTOR = document.getElementById("ac_protocol_selector");
+const ON_BUTTON = document.getElementById("on_button");
+const OFF_BUTTON = document.getElementById("off_button");
+const TEMP_SCREEN = document.getElementById("temp-screen");
+const SERVER_PORT = 5000;
+
+let powerStatus = true;
+let canvas = document.querySelector("canvas");
+let ctx = canvas.getContext("2d");
+let ws = new WebSocket(`ws://fing-bot.brazilsouth.cloudapp.azure.com:${SERVER_PORT}/wstest`);
+
+const protocols = [
+    "RC5", "RC6", "NEC", "SONY", "PANASONIC", "JVC", "SAMSUNG", "WHYNTER", "AIWA_RC_T501", "LG",
+    "SANYO", "MITSUBISHI", "DISH", "SHARP", "COOLIX", "DAIKIN", "DENON", "KELVINATOR", "SHERWOOD", "MITSUBISHI_AC",
+    "RCMM", "SANYO_LC7461", "RC5X", "GREE", "PRONTO", "NEC_LIKE", "ARGO", "TROTEC", "NIKAI", "RAW",
+    "GLOBALCACHE", "TOSHIBA_AC", "FUJITSU_AC", "MIDEA", "MAGIQUEST", "LASERTAG", "CARRIER_AC", "HAIER_AC", "MITSUBISHI2", "HITACHI_AC",
+    "HITACHI_AC1", "HITACHI_AC2", "GICABLE", "HAIER_AC_YRW02", "WHIRLPOOL_AC", "SAMSUNG_AC", "LUTRON", "ELECTRA_AC", "PANASONIC_AC", "PIONEER",
+    "LG2", "MWM", "DAIKIN2", "VESTEL_AC", "TECO", "SAMSUNG36", "TCL112AC", "LEGOPF", "MITSUBISHI_HEAVY_88", "MITSUBISHI_HEAVY_152",
+    "DAIKIN216", "SHARP_AC", "GOODWEATHER", "INAX", "DAIKIN160", "NEOCLIMA", "DAIKIN176", "DAIKIN128", "AMCOR", "DAIKIN152",
+    "MITSUBISHI136", "MITSUBISHI112", "HITACHI_AC424", "SONY_38K", "EPSON", "SYMPHONY", "HITACHI_AC3", "DAIKIN64", "AIRWELL", "DELONGHI_AC",
+    "DOSHISHA", "MULTIBRACKETS", "CARRIER_AC40", "CARRIER_AC64", "HITACHI_AC344", "CORONA_AC", "MIDEA24", "ZEPEAL", "SANYO_AC", "VOLTAS",
+    "METZ", "TRANSCOLD", "TECHNIBEL_AC", "MIRAGE", "ELITESCREENS", "PANASONIC_AC32", "MILESTAG2", "ECOCLIM", "XMP", "TRUMA",
+    "HAIER_AC176", "TEKNOPOINT", "KELON", "TROTEC_3550", "SANYO_AC88", "BOSE", "ARRIS", "RHOSS", "AIRTON", "COOLIX48",
+    "HITACHI_AC264", "KELON168", "HITACHI_AC296", "DAIKIN200", "HAIER_AC160", "CARRIER_AC128", "TOTO", "CLIMABUTLER", "TCL96AC", "BOSCH144",
+    "SANYO_AC152", "DAIKIN312", "GORENJE", "WOWWEE", "CARRIER_AC84", "YORK", "BLUESTARHEAVY"
+];
+
+protocols.forEach(protocol => {
+    const option = document.createElement("option");
+    option.value = protocols.indexOf(protocol) + 1;
+    option.textContent = protocol;
+    AC_SELECTOR.appendChild(option);
+});
+
+ws.onmessage = async (msg) => {
+    console.log(msg);
+    let d = await msg.data.bytes();
+    let buffer = new Uint8ClampedArray(d);
+    
+    //console.log(buffer);
+    let imd = new ImageData(buffer, 3, 2);
+    ctx.putImageData(imd, 0, 0);
+}
+
+INC_TEMP_ICON.addEventListener("click", async () => {
+    sendDataToAircon({
+        protocol: Number(AC_SELECTOR.value),
+        temperature: "increase",
+        power: powerStatus
+    }).catch(error => console.error("Failed to send aircon command: ", error));
+});
+
+DEC_TEMP_ICON.addEventListener("click", () => {
+    sendDataToAircon({
+        protocol: Number(AC_SELECTOR.value),
+        temperature: "decrease",
+        power: powerStatus
+    }).catch(error => console.error("Failed to send aircon command: ", error));
+});
+
+AC_SELECTOR.addEventListener("change", async (ev) => {
+    sendDataToAircon({
+        protocol: Number(AC_SELECTOR.value),
+        temperature: "current",
+        power: powerStatus
+    }).catch(error => console.error("Failed to send aircon command: ", error));
+})
+
+ON_BUTTON.addEventListener("click", async (ev) => {
+    powerStatus = true;
+    sendDataToAircon({
+        protocol: Number(AC_SELECTOR.value),
+        temperature: "current",
+        power: powerStatus
+    }).catch(error => console.error("Failed to send aircon command: ", error));
+})
+
+OFF_BUTTON.addEventListener("click", async (ev) => {
+    powerStatus = false;
+    sendDataToAircon({
+        protocol: Number(AC_SELECTOR.value),
+        temperature: "current",
+        power: powerStatus
+    }).catch(error => console.error("Failed to send aircon command: ", error));
+})
+
+async function sendDataToAircon(JSONBody) {
+    const response = await fetch(`http://fing-bot.brazilsouth.cloudapp.azure.com:${SERVER_PORT}/aircon`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(JSONBody)
+    });
+
+    if (!response.ok) {
+        throw new Error(`HTTP Error! Status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log("Server response: ", data);
+    TEMP_SCREEN.innerHTML = data.temperature;
+}

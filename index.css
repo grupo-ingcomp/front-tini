@@ -1,0 +1,115 @@
+html {
+    box-sizing: border-box;
+}
+
+*, *:before, *:after {
+    box-sizing: inherit;
+}
+
+* {
+    font-family: "Inter", sans-serif;
+    font-optical-sizing: auto;
+    font-style: normal;
+
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 1rem;
+}
+
+#title {
+    text-align: center;
+}
+
+#panel {
+    display: flex;
+    flex-direction: column;
+    min-width: 100%;
+}
+
+.subtitle-container {
+    display: flex;
+    justify-content: space-between;
+    margin-left: 20%;
+    margin-right: 20%;
+}
+
+.subtitle {
+    text-align: center;
+}
+
+.dashboards {
+    display: flex;
+    justify-content: center;
+    justify-content: space-between;
+    margin-left: 15%;
+    margin-right: 15%;
+    min-width: fit-content;
+    gap: 4rem;
+}
+
+.cam, .remote-control {
+    width: 50%;
+}
+
+.remote-control {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    position: relative;
+}
+
+.manage-temp-icon {
+    width: 2rem;
+}
+
+.cam {
+    border: 1px solid black;
+    border-radius: 5px;
+    width: fit-content;
+}
+
+.temp-icons {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.manage-temp-icon {
+    cursor: pointer;
+    background-color: antiquewhite;
+    border: 1px solid purple;
+    border-radius: 5px;
+    padding: 0.4rem;
+}
+
+#temp-screen {
+    border: 4px dashed red;
+    font-family: "Orbitron", sans-serif;
+    font-size: 2.2rem;
+    color: green;
+    border-radius: 8px;
+    width: 12rem;
+    height: 6.5rem;
+    line-height: 6rem;
+    text-align: center;
+    background-color: black;;
+}
+
+.power-button {
+    border: 1px solid rgb(90, 170, 201);
+    border-radius: 5px;
+    background: skyblue;
+    color: white;
+    text-align: center;
+    padding: 0.4rem;
+    cursor: pointer;
+}
+
+#ac_protocol_selector {
+    position: absolute;
+    top: 1rem;
+}
